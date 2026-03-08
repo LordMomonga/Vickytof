@@ -7,6 +7,9 @@ import {
   Dialog,
   DialogContent,
   Divider,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
   MenuItem,
   TextField,
 } from "@mui/material";
@@ -89,6 +92,8 @@ export const BookingPage = () => {
   const [date, setDate] = useState("");
   const [notes, setNotes] = useState("");
   const [productMode, setProductMode] = useState<"delivery" | "pickup">("delivery");
+  const [paymentMethod, setPaymentMethod] = useState<"paypal" | "card" | "interac">("paypal");
+  const [depositPaid, setDepositPaid] = useState(false);
 
   const selectedLocation = useMemo(
     () => quebecLocations.find((location) => location.id === locationId) ?? null,
@@ -117,6 +122,15 @@ export const BookingPage = () => {
     return selectedService.price;
   }, [selectedService, isRemoteSalonService, selectedLocation]);
 
+  const depositAmount = useMemo(() => Math.round(totalPrice * 0.3), [totalPrice]);
+  const remainingAmount = useMemo(() => Math.max(totalPrice - depositAmount, 0), [totalPrice, depositAmount]);
+
+  const bookingFormValid = useMemo(() => {
+    return fullName.trim() && email.trim() && phone.trim() && date.trim();
+  }, [fullName, email, phone, date]);
+
+  const confirmDisabled = !bookingFormValid || !depositPaid;
+
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <Button variant="contained" onClick={() => setOpen(true)} sx={{ bgcolor: "#000", borderRadius: 0, "&:hover": { bgcolor: "#111" } }}>
@@ -132,14 +146,14 @@ export const BookingPage = () => {
       >
         <DialogContent sx={{ p: 0 }}>
           <div className="px-6 pb-5 pt-6 text-center">
-            <p className="brand-script text-5xl text-violet-500">vicktykof</p>
+            <p className="brand-script text-4xl text-violet-500">vicktykof</p>
           </div>
 
           <Divider />
 
           {step === 1 && (
             <>
-              <p className="py-5 text-center text-2xl font-semibold">Selectionnez un lieu (Quebec):</p>
+              <p className="py-4 text-center text-xl font-semibold">Selectionnez un lieu (Quebec):</p>
               {quebecLocations.map((location, index) => (
                 <button
                   key={location.id}
@@ -147,9 +161,9 @@ export const BookingPage = () => {
                     setLocationId(location.id);
                     setStep(2);
                   }}
-                  className="flex w-full items-center justify-between border-t border-slate-300 px-6 py-6 text-left hover:bg-slate-100"
+                  className="flex w-full items-center justify-between border-t border-slate-300 px-6 py-5 text-left hover:bg-slate-100"
                 >
-                  <span className="text-lg font-semibold text-slate-900">
+                  <span className="text-base font-semibold text-slate-900">
                     {index + 1}. {location.salon}
                   </span>
                   <ChevronRightIcon sx={{ color: "#7f8790" }} />
@@ -174,7 +188,7 @@ export const BookingPage = () => {
                 </Alert>
               )}
 
-              <p className="py-5 text-center text-2xl font-semibold">Selectionnez un service:</p>
+              <p className="py-4 text-center text-xl font-semibold">Selectionnez un service:</p>
               {selectedLocation.services.map((service) => (
                 <button
                   key={service.id}
@@ -182,15 +196,15 @@ export const BookingPage = () => {
                     setServiceId(service.id);
                     setStep(3);
                   }}
-                  className="grid w-full grid-cols-[1fr_auto] items-center border-t border-slate-300 px-6 py-5 text-left hover:bg-slate-100"
+                  className="grid w-full grid-cols-[1fr_auto] items-center border-t border-slate-300 px-6 py-4 text-left hover:bg-slate-100"
                 >
                   <div>
-                    <p className="text-lg font-semibold text-slate-900">{service.name}</p>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-base font-semibold text-slate-900">{service.name}</p>
+                    <p className="text-xs text-slate-500">
                       {service.kind === "salon" ? `${service.duration} min` : "Produit"}
                     </p>
                   </div>
-                  <p className="text-xl font-semibold">${service.price}</p>
+                  <p className="text-lg font-semibold">${service.price}</p>
                 </button>
               ))}
             </>
@@ -217,10 +231,12 @@ export const BookingPage = () => {
                 </Alert>
               )}
 
-              <div className="mx-auto max-w-[440px] rounded-xl border border-slate-300 bg-white p-3">
-                <h3 className="text-base font-semibold">Formulaire de reservation</h3>
-                <p className="mt-1 text-sm text-slate-600">{selectedService.name}</p>
-                <p className="mb-3 text-sm font-semibold text-slate-900">Prix total: ${totalPrice}</p>
+              <div className="mx-auto max-w-[420px] rounded-xl border border-slate-300 bg-white p-3">
+                <h3 className="text-sm font-semibold">Formulaire de reservation</h3>
+                <p className="mt-1 text-xs text-slate-600">{selectedService.name}</p>
+                <p className="mb-1 text-sm font-semibold text-slate-900">Prix total: ${totalPrice}</p>
+                <p className="text-xs text-slate-600">Avance (30%): ${depositAmount}</p>
+                <p className="mb-3 text-xs text-slate-600">Reste a payer sur place: ${remainingAmount}</p>
 
                 <div className="grid gap-2">
                   <TextField size="small" label="Nom complet" value={fullName} onChange={(e) => setFullName(e.target.value)} />
@@ -244,12 +260,48 @@ export const BookingPage = () => {
                   <TextField size="small" label="Notes" multiline minRows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
                 </div>
 
+                <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-2">
+                  <p className="text-xs font-semibold text-slate-900">Paiement de l'avance</p>
+                  <p className="mb-1 text-xs text-slate-600">Selectionnez votre methode: PayPal ou autres.</p>
+                  <RadioGroup
+                    value={paymentMethod}
+                    onChange={(e) => {
+                      setPaymentMethod(e.target.value as "paypal" | "card" | "interac");
+                      setDepositPaid(false);
+                    }}
+                  >
+                    <FormControlLabel value="paypal" control={<Radio size="small" />} label={<span className="text-xs">PayPal</span>} />
+                    <FormControlLabel value="card" control={<Radio size="small" />} label={<span className="text-xs">Carte bancaire (Visa/Mastercard)</span>} />
+                    <FormControlLabel value="interac" control={<Radio size="small" />} label={<span className="text-xs">Interac e-Transfer</span>} />
+                  </RadioGroup>
+
+                  <Button
+                    fullWidth
+                    size="small"
+                    sx={{ mt: 1, borderRadius: 0, bgcolor: "#4f46e5", color: "#fff", "&:hover": { bgcolor: "#4338ca" } }}
+                    onClick={() => setDepositPaid(true)}
+                  >
+                    Payer l'avance de ${depositAmount}
+                  </Button>
+
+                  {depositPaid ? (
+                    <Alert severity="success" sx={{ mt: 1, py: 0 }}>
+                      Avance payee avec succes via {paymentMethod === "paypal" ? "PayPal" : paymentMethod === "card" ? "Carte bancaire" : "Interac"}.
+                    </Alert>
+                  ) : (
+                    <Alert severity="warning" sx={{ mt: 1, py: 0 }}>
+                      Vous devez payer l'avance avant de confirmer.
+                    </Alert>
+                  )}
+                </div>
+
                 <Button
                   fullWidth
                   sx={{ mt: 2, borderRadius: 0, bgcolor: "#000", color: "#fff", "&:hover": { bgcolor: "#111" } }}
                   onClick={() => setOpen(false)}
+                  disabled={confirmDisabled}
                 >
-                  Confirmer
+                  Confirmer la reservation
                 </Button>
               </div>
             </Box>
