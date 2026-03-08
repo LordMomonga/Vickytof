@@ -130,7 +130,7 @@ export const AppLayout = () => {
                             </IconButton>
 
 
-              <Link to="/" className="brand-script ml-10 text-2xl text-violet-500">
+              <Link to="/" className="brand-script ml-10 text-2xl text-violet-500 font-bold">
                 vicktykof
               </Link>
             </div>
