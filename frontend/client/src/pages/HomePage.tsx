@@ -1,72 +1,80 @@
+﻿import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { Button, IconButton } from "@mui/material";
 import { motion } from "framer-motion";
-
-const products = [
-  { name: "Pink Super Hold Gel", price: "From $22.00", rating: "(4.7)" },
-  { name: "Funky Loc Spray", price: "From $22.00", rating: "(4.8)" },
-  { name: "Super Hold Retwist Gel", price: "From $22.00", rating: "(4.8)" },
-  { name: "Rose Water Hydrating Mist", price: "From $22.00", rating: "(4.8)" },
-];
-
-const styles = [
-  "Book Comb Retwist",
-  "Book Comb Retwist + Loc Petals",
-  "Book Comb Retwist + Rope Twist",
-  "Book Comb Retwist + Pipe Cleaners",
-];
+import { useRef } from "react";
+import { Link } from "react-router-dom";
+import { ProductGrid } from "../components/ProductGrid";
+import { catalogProducts, heroImage, popularServices } from "../data/catalog";
 
 export const HomePage = () => {
+  const serviceSliderRef = useRef<HTMLDivElement | null>(null);
+
+  const slideServices = (direction: "left" | "right") => {
+    if (!serviceSliderRef.current) {
+      return;
+    }
+    const amount = serviceSliderRef.current.clientWidth * 0.9;
+    serviceSliderRef.current.scrollBy({ left: direction === "left" ? -amount : amount, behavior: "smooth" });
+  };
+
   return (
-    <div className="space-y-14 pb-8">
+    <div className="space-y-12 pb-8">
       <motion.section
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="overflow-hidden rounded-[20px] border border-slate-300 bg-[#eceaec]"
+        className="overflow-hidden border border-slate-300 bg-[#ececec]"
       >
-        <div className="h-[420px] w-full bg-[linear-gradient(140deg,#d8d4dc_0%,#f1eff4_45%,#d9d5de_100%)]" />
+        <img src={heroImage} alt="vicktykof hero" className="h-[350px] w-full object-cover sm:h-[520px]" loading="eager" />
+        <div className="flex justify-center py-4">
+          <Button component={Link} to="/booking" variant="contained" sx={{ bgcolor: "#000", borderRadius: 0, px: 5, py: 1.2, "&:hover": { bgcolor: "#111" } }}>
+            BOOK APPOINTMENT
+          </Button>
+        </div>
       </motion.section>
 
-      <section className="space-y-5">
-        <h2 className="text-center text-3xl font-bold text-black">Shop Products</h2>
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {products.map((item, i) => (
-            <motion.article
-              key={item.name}
-              initial={{ opacity: 0, y: 18 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ delay: i * 0.07 }}
-              className="overflow-hidden rounded-[18px] border border-slate-300 bg-[#f4f2f7]"
-            >
-              <div className="h-64 bg-gradient-to-b from-[#ddd7e6] via-[#f0edf5] to-[#d9d2e3]" />
-              <div className="space-y-1 p-4">
-                <p className="text-lg font-semibold leading-tight text-black">{item.name}</p>
-                <p className="text-base font-medium text-slate-900">{item.price}</p>
-                <p className="text-sm font-medium text-violet-700">★★★★★ {item.rating}</p>
-              </div>
-            </motion.article>
-          ))}
-        </div>
-      </section>
+      <ProductGrid title="Shop Loc Products" products={catalogProducts.filter((p) => p.section === "products")} />
+
+      <div className="flex justify-center">
+        <Button component={Link} to="/products" variant="contained" sx={{ bgcolor: "#000", borderRadius: 0, px: 5, py: 1.2, "&:hover": { bgcolor: "#111" } }}>
+          View all
+        </Button>
+      </div>
 
       <section className="space-y-5">
-        <h2 className="text-center text-3xl font-bold text-black">Loc Style Gallery</h2>
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {styles.map((item, i) => (
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-bold text-black md:text-5xl">Popular Services</h2>
+          <div className="hidden items-center gap-1 md:flex">
+            <IconButton onClick={() => slideServices("left")} sx={{ border: "1px solid #cbd5e1", borderRadius: 0 }}>
+              <ChevronLeftIcon />
+            </IconButton>
+            <IconButton onClick={() => slideServices("right")} sx={{ border: "1px solid #cbd5e1", borderRadius: 0 }}>
+              <ChevronRightIcon />
+            </IconButton>
+          </div>
+        </div>
+
+        <div ref={serviceSliderRef} className="flex gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {popularServices.map((service, i) => (
             <motion.div
-              key={item}
-              initial={{ opacity: 0, y: 18 }}
+              key={service.id}
+              initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ delay: i * 0.07 }}
-              className="overflow-hidden rounded-[18px] border border-slate-300 bg-[#f2f0f4]"
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+              className="min-w-[78%] sm:min-w-[46%] lg:min-w-[31%] xl:min-w-[24%]"
             >
-              <div className="h-72 bg-gradient-to-br from-[#d7d1e2] to-[#f4f2f7]" />
-              <p className="p-4 text-center text-sm font-medium text-slate-900">{item}</p>
+              <img src={service.image} alt={service.name} className="h-72 w-full object-cover" />
+              <p className="pt-2 text-center text-sm font-medium">{service.name}</p>
             </motion.div>
           ))}
         </div>
       </section>
+
+      <ProductGrid title="Shop Loc Extensions" products={catalogProducts.filter((p) => p.section === "extensions")} />
+      <ProductGrid title="Shop Loc Styling Tools" products={catalogProducts.filter((p) => p.section === "tools")} />
+      <ProductGrid title="Shop Kits" products={catalogProducts.filter((p) => p.section === "kits")} />
     </div>
   );
 };

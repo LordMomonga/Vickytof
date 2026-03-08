@@ -1,4 +1,4 @@
-import { Alert, Button, Card, CardContent, TextField } from "@mui/material";
+import { Alert, Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "../hooks/useAuth";
@@ -7,8 +7,8 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const login = useLogin();
 
-  const [email, setEmail] = useState("admin@salonpro.com");
-  const [password, setPassword] = useState("123456");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const submit = async () => {
     try {
@@ -20,27 +20,99 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="mx-auto max-w-md">
-      <Card className="rounded-3xl">
-        <CardContent className="space-y-4 p-6">
-          <h1 className="text-2xl font-bold">Connexion</h1>
+    <div className="flex min-h-[70vh] items-center justify-center">
+      <Box className="w-full max-w-[540px] rounded-2xl bg-[#f1f1f1] p-8 shadow-[0_8px_22px_rgba(0,0,0,0.08)]">
+        <div className="mb-7 text-center">
+          <p className="brand-script text-5xl text-violet-500">vicktykof</p>
+        </div>
 
-          {login.isError && <Alert severity="error">Identifiants invalides.</Alert>}
+        <h1 className="text-[42px] font-semibold leading-tight text-black">Sign in</h1>
+        <p className="mt-2 text-[16px] text-slate-600">Sign in or create an account</p>
 
-          <TextField label="Email" value={email} onChange={(event) => setEmail(event.target.value)} fullWidth />
-          <TextField
-            label="Mot de passe"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            fullWidth
-          />
+        {login.isError && (
+          <Alert severity="error" sx={{ mt: 2.5 }}>
+            Invalid credentials.
+          </Alert>
+        )}
 
-          <Button variant="contained" fullWidth onClick={submit} disabled={login.isPending}>
-            Se connecter
-          </Button>
-        </CardContent>
-      </Card>
+        <Button
+          fullWidth
+          sx={{
+            mt: 3,
+            borderRadius: "14px",
+            py: 1.65,
+            fontSize: "1.9rem",
+            textTransform: "none",
+            fontWeight: 700,
+            color: "#fff",
+            background: "linear-gradient(90deg, #4f46e5 0%, #5b21b6 100%)",
+            "&:hover": {
+              background: "linear-gradient(90deg, #4338ca 0%, #4c1d95 100%)",
+            },
+          }}
+        >
+          Continue with shop
+        </Button>
+
+        <div className="my-5 flex items-center gap-3 text-slate-500">
+          <div className="h-[1px] flex-1 bg-slate-300" />
+          <span className="text-sm">or</span>
+          <div className="h-[1px] flex-1 bg-slate-300" />
+        </div>
+
+        <TextField
+          placeholder="Email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          fullWidth
+          variant="outlined"
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "12px",
+              bgcolor: "#f7f7f7",
+            },
+          }}
+        />
+
+        <TextField
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          fullWidth
+          sx={{
+            mt: 1.7,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "12px",
+              bgcolor: "#f7f7f7",
+            },
+          }}
+        />
+
+        <Button
+          fullWidth
+          onClick={submit}
+          disabled={login.isPending}
+          sx={{
+            mt: 2.2,
+            borderRadius: "12px",
+            py: 1.45,
+            fontSize: "1.5rem",
+            textTransform: "none",
+            fontWeight: 700,
+            color: "#fff",
+            bgcolor: "#0b63ce",
+            "&:hover": { bgcolor: "#0b55af" },
+          }}
+        >
+          Continue
+        </Button>
+
+        <div className="mt-6 flex justify-center gap-4 text-sm text-[#0b63ce]">
+          <a href="#">Privacy policy</a>
+          <a href="#">Terms of service</a>
+        </div>
+      </Box>
     </div>
   );
 };

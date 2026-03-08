@@ -1,218 +1,207 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Alert, Button, Card, CardContent, MenuItem, TextField, Typography } from "@mui/material";
-import { motion } from "framer-motion";
-import { useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import {
-  useAvailableSlots,
-  useCreateAppointment,
-  useEmployees,
-  useServices,
-} from "../hooks/useSalonApi";
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  Divider,
+  TextField,
+} from "@mui/material";
+import { useMemo, useState } from "react";
 
-const bookingSchema = z.object({
-  service: z.string().min(1, "Service requis"),
-  employee: z.string().min(1, "Coiffeur requis"),
-  date: z.string().min(1, "Date requise"),
-  slot: z.string().min(1, "Créneau requis"),
-  notes: z.string().optional(),
-});
+type Service = { id: string; name: string; duration: number; price: number };
+type Location = { id: string; city: string; salon: string; services: Service[] };
 
-type BookingValues = z.infer<typeof bookingSchema>;
+const quebecLocations: Location[] = [
+  {
+    id: "quebec-city",
+    city: "Quebec City",
+    salon: "Vicktykof Quebec (Sainte-Foy)",
+    services: [
+      { id: "qc-consult", name: "Consultation loc", duration: 30, price: 40 },
+      { id: "qc-retwist", name: "Comb Retwist", duration: 120, price: 135 },
+      { id: "qc-style", name: "Retwist + Style", duration: 150, price: 165 },
+      { id: "qc-detox", name: "Loc Detox", duration: 75, price: 95 },
+    ],
+  },
+  {
+    id: "montreal",
+    city: "Montreal",
+    salon: "Vicktykof Montreal (Centre-Ville)",
+    services: [
+      { id: "mtl-consult", name: "Consultation loc", duration: 30, price: 45 },
+      { id: "mtl-starter", name: "Starter Locs", duration: 180, price: 220 },
+      { id: "mtl-crochet", name: "Crochet Retwist", duration: 150, price: 170 },
+      { id: "mtl-color", name: "Color Consultation", duration: 45, price: 70 },
+    ],
+  },
+  {
+    id: "laval",
+    city: "Laval",
+    salon: "Vicktykof Laval (Chomedey)",
+    services: [
+      { id: "lvl-retwist", name: "Comb Retwist", duration: 120, price: 130 },
+      { id: "lvl-micro", name: "Micro Loc Maintenance", duration: 210, price: 260 },
+      { id: "lvl-extensions", name: "Loc Extensions Repair", duration: 180, price: 220 },
+    ],
+  },
+  {
+    id: "gatineau",
+    city: "Gatineau",
+    salon: "Vicktykof Gatineau (Hull)",
+    services: [
+      { id: "gat-consult", name: "Consultation loc", duration: 30, price: 40 },
+      { id: "gat-retwist", name: "Comb Retwist + Style", duration: 150, price: 160 },
+      { id: "gat-detox", name: "Detox + Steam", duration: 75, price: 100 },
+    ],
+  },
+];
 
 export const BookingPage = () => {
-  const { data: services = [], isLoading: loadingServices } = useServices();
-  const { data: employees = [], isLoading: loadingEmployees } = useEmployees();
-  const createAppointment = useCreateAppointment();
+  const [open, setOpen] = useState(true);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [locationId, setLocationId] = useState<string | null>(null);
+  const [serviceId, setServiceId] = useState<string | null>(null);
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm<BookingValues>({
-    resolver: zodResolver(bookingSchema),
-    defaultValues: {
-      service: "",
-      employee: "",
-      date: "",
-      slot: "",
-      notes: "",
-    },
-  });
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [date, setDate] = useState("");
+  const [notes, setNotes] = useState("");
 
-  const selectedService = watch("service");
-  const selectedEmployee = watch("employee");
-  const selectedDate = watch("date");
-  const selectedSlot = watch("slot");
-
-  const { data: slots = [], isLoading: loadingSlots } = useAvailableSlots(
-    selectedEmployee,
-    selectedService,
-    selectedDate,
+  const selectedLocation = useMemo(
+    () => quebecLocations.find((location) => location.id === locationId) ?? null,
+    [locationId],
   );
-
-  const selectedServiceItem = useMemo(
-    () => services.find((service) => service._id === selectedService),
-    [services, selectedService],
+  const selectedService = useMemo(
+    () => selectedLocation?.services.find((service) => service.id === serviceId) ?? null,
+    [selectedLocation, serviceId],
   );
-
-  const selectedEmployeeItem = useMemo(
-    () => employees.find((employee) => employee._id === selectedEmployee),
-    [employees, selectedEmployee],
-  );
-
-  const onSubmit = handleSubmit(async (values) => {
-    await createAppointment.mutateAsync({
-      employee: values.employee,
-      service: values.service,
-      date: values.date,
-      startTime: values.slot,
-      notes: values.notes,
-    });
-
-    reset({ service: "", employee: "", date: "", slot: "", notes: "" });
-  });
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
-      <Card className="rounded-3xl">
-        <CardContent className="space-y-6 p-6">
-          <div>
-            <h2 className="text-2xl font-bold">Prendre un rendez-vous</h2>
-            <p className="text-slate-500">Choisissez votre prestation et votre créneau.</p>
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <Button variant="contained" onClick={() => setOpen(true)} sx={{ bgcolor: "#000", borderRadius: 0, "&:hover": { bgcolor: "#111" } }}>
+        Open Booking Modal
+      </Button>
+
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        fullWidth
+        maxWidth="md"
+        PaperProps={{
+          sx: { borderRadius: "22px", bgcolor: "#f2f2f2" },
+        }}
+      >
+        <DialogContent sx={{ p: 0 }}>
+          <div className="flex items-center justify-between px-6 pb-5 pt-6">
+            <p className="brand-script text-4xl text-violet-500">vicktykof</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
+              Powered by
+              <br />
+              mangomint
+            </p>
           </div>
 
-          {createAppointment.isSuccess && (
-            <Alert severity="success">Rendez-vous confirmé avec succès.</Alert>
+          <Divider />
+
+          {step === 1 && (
+            <>
+              <p className="py-5 text-center text-2xl font-semibold">Select a location:</p>
+              {quebecLocations.map((location, index) => (
+                <button
+                  key={location.id}
+                  onClick={() => {
+                    setLocationId(location.id);
+                    setStep(2);
+                  }}
+                  className="flex w-full items-center justify-between border-t border-slate-300 px-6 py-6 text-left hover:bg-slate-100"
+                >
+                  <span className="text-xl font-semibold text-slate-900">
+                    {index + 1}. {location.city} - {location.salon}
+                  </span>
+                  <ChevronRightIcon sx={{ color: "#7f8790" }} />
+                </button>
+              ))}
+            </>
           )}
 
-          {createAppointment.isError && (
-            <Alert severity="error">Impossible de créer le rendez-vous.</Alert>
+          {step === 2 && selectedLocation && (
+            <>
+              <div className="flex items-center justify-between px-6 py-4">
+                <Button
+                  startIcon={<KeyboardBackspaceIcon />}
+                  onClick={() => setStep(1)}
+                  sx={{ color: "#111827", textTransform: "none" }}
+                >
+                  Back
+                </Button>
+                <p className="text-sm font-semibold text-slate-500">{selectedLocation.city}</p>
+              </div>
+              <Divider />
+              <p className="py-5 text-center text-2xl font-semibold">Select a service:</p>
+              {selectedLocation.services.map((service) => (
+                <button
+                  key={service.id}
+                  onClick={() => {
+                    setServiceId(service.id);
+                    setStep(3);
+                  }}
+                  className="grid w-full grid-cols-[1fr_auto] items-center border-t border-slate-300 px-6 py-5 text-left hover:bg-slate-100"
+                >
+                  <div>
+                    <p className="text-xl font-semibold text-slate-900">{service.name}</p>
+                    <p className="text-sm text-slate-500">{service.duration} min</p>
+                  </div>
+                  <p className="text-2xl font-semibold">${service.price}</p>
+                </button>
+              ))}
+            </>
           )}
 
-          <form onSubmit={onSubmit} className="grid gap-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <Controller
-                name="service"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    label="Service"
-                    error={Boolean(errors.service)}
-                    helperText={errors.service?.message}
-                    fullWidth
-                  >
-                    {services.map((service) => (
-                      <MenuItem key={service._id} value={service._id}>
-                        {service.name} - {service.price} EUR
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
-              />
+          {step === 3 && selectedLocation && selectedService && (
+            <Box className="px-6 pb-6 pt-4">
+              <div className="mb-4 flex items-center justify-between">
+                <Button
+                  startIcon={<KeyboardBackspaceIcon />}
+                  onClick={() => setStep(2)}
+                  sx={{ color: "#111827", textTransform: "none" }}
+                >
+                  Back
+                </Button>
+                <p className="text-sm font-semibold text-slate-500">{selectedLocation.city}</p>
+              </div>
 
-              <Controller
-                name="employee"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    label="Coiffeur"
-                    error={Boolean(errors.employee)}
-                    helperText={errors.employee?.message}
-                    fullWidth
-                  >
-                    {employees.map((employee) => (
-                      <MenuItem key={employee._id} value={employee._id}>
-                        {employee.user.firstName} {employee.user.lastName}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
-              />
+              <div className="mx-auto max-w-[520px] rounded-xl border border-slate-300 bg-white p-4">
+                <h3 className="text-lg font-semibold">Appointment Form</h3>
+                <p className="mt-1 text-sm text-slate-600">
+                  {selectedService.name} - {selectedService.duration} min
+                </p>
+                <p className="mb-4 text-sm font-semibold text-slate-900">
+                  Total price: ${selectedService.price}
+                </p>
 
-              <Controller
-                name="date"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    label="Date"
-                    type="date"
-                    InputLabelProps={{ shrink: true }}
-                    error={Boolean(errors.date)}
-                    helperText={errors.date?.message}
-                    fullWidth
-                  />
-                )}
-              />
+                <div className="grid gap-3">
+                  <TextField size="small" label="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                  <TextField size="small" label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <TextField size="small" label="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                  <TextField size="small" label="Preferred date" type="date" value={date} onChange={(e) => setDate(e.target.value)} InputLabelProps={{ shrink: true }} />
+                  <TextField size="small" label="Notes" multiline minRows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+                </div>
 
-              <Controller
-                name="slot"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    select
-                    label="Créneau"
-                    error={Boolean(errors.slot)}
-                    helperText={errors.slot?.message}
-                    fullWidth
-                  >
-                    {slots.map((slot) => (
-                      <MenuItem key={slot} value={slot}>
-                        {slot}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                )}
-              />
-            </div>
-
-            <Controller
-              name="notes"
-              control={control}
-              render={({ field }) => <TextField {...field} label="Notes" multiline minRows={2} fullWidth />}
-            />
-
-            <motion.div whileTap={{ scale: 0.98 }}>
-              <Button
-                type="submit"
-                variant="contained"
-                size="large"
-                fullWidth
-                disabled={loadingServices || loadingEmployees || loadingSlots || createAppointment.isPending}
-              >
-                Confirmer le rendez-vous
-              </Button>
-            </motion.div>
-          </form>
-        </CardContent>
-      </Card>
-
-      <Card className="h-fit rounded-3xl">
-        <CardContent className="space-y-4 p-6">
-          <h3 className="text-xl font-bold">Résumé</h3>
-          <div className="space-y-2 text-slate-600">
-            <Typography>Service: {selectedServiceItem?.name ?? "-"}</Typography>
-            <Typography>
-              Coiffeur:{" "}
-              {selectedEmployeeItem
-                ? `${selectedEmployeeItem.user.firstName} ${selectedEmployeeItem.user.lastName}`
-                : "-"}
-            </Typography>
-            <Typography>Date: {selectedDate || "-"}</Typography>
-            <Typography>Créneau: {selectedSlot || "-"}</Typography>
-            <Typography>Prix: {selectedServiceItem ? `${selectedServiceItem.price} EUR` : "-"}</Typography>
-          </div>
-        </CardContent>
-      </Card>
+                <Button
+                  fullWidth
+                  sx={{ mt: 2, borderRadius: 0, bgcolor: "#000", color: "#fff", "&:hover": { bgcolor: "#111" } }}
+                  onClick={() => setOpen(false)}
+                >
+                  Confirm Appointment
+                </Button>
+              </div>
+            </Box>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
