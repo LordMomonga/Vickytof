@@ -39,19 +39,20 @@ export const LoginPage = () => {
           fullWidth
           sx={{
             mt: 3,
-            borderRadius: "14px",
-            py: 1.65,
-            fontSize: "1.9rem",
+            borderRadius: "12px",
+            py: 1.35,
+            fontSize: "1rem",
             textTransform: "none",
-            fontWeight: 700,
-            color: "#fff",
-            background: "linear-gradient(90deg, #4f46e5 0%, #5b21b6 100%)",
+            fontWeight: 600,
+            color: "#111827",
+            background: "#ffffff",
+            border: "1px solid #d1d5db",
             "&:hover": {
-              background: "linear-gradient(90deg, #4338ca 0%, #4c1d95 100%)",
+              background: "#f8fafc",
             },
           }}
         >
-          Continue with shop
+          Continue with Google
         </Button>
 
         <div className="my-5 flex items-center gap-3 text-slate-500">

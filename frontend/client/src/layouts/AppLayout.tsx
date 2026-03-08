@@ -1,6 +1,5 @@
 ﻿import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import CloseIcon from "@mui/icons-material/Close";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import MenuIcon from "@mui/icons-material/Menu";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
@@ -80,16 +79,18 @@ export const AppLayout = () => {
       <header className="border-b border-slate-300 bg-[#ececec]">
         <Container maxWidth="xl">
           <Toolbar disableGutters className="min-h-[126px] justify-between gap-4 px-1" sx={{ display: { xs: "none", md: "flex" } }}>
-            <div className="hidden items-center gap-1 lg:flex">
-              <span className="text-[28px] leading-none text-slate-900">$</span>
-              <span className="text-[15px] font-medium text-slate-900">CANADA (CAD $)</span>
-              <KeyboardArrowDownIcon sx={{ color: "#111827" }} />
+             <div>
+              --
             </div>
 
-            <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="brand-script text-2xl text-violet-500 md:text-3xl">
-              vicktykof
-            </motion.div>
 
+          
+            <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
+              <Link to="/" className="brand-script text-2xl text-violet-500 md:text-3xl ">
+                vicktykof
+              </Link>
+            </motion.div>
+          
             <div className="flex items-center gap-2">
               <Button
                 component={Link}
@@ -111,7 +112,7 @@ export const AppLayout = () => {
               <IconButton onClick={() => setSearchOpen(true)}>
                 <SearchOutlinedIcon />
               </IconButton>
-              <IconButton component={Link} to={user ? "/appointments" : "/login"}>
+              <IconButton component={Link} to="/login">
                 <PersonOutlineOutlinedIcon />
               </IconButton>
               <IconButton component={Link} to="/cart">
@@ -123,17 +124,23 @@ export const AppLayout = () => {
           </Toolbar>
 
           <Toolbar disableGutters className="min-h-[92px] justify-between" sx={{ display: { xs: "flex", md: "none" } }}>
-            <IconButton onClick={() => setMenuOpen(true)}>
-              <MenuIcon />
-            </IconButton>
+            <div className="flex items-center gap-1">
+                            <IconButton onClick={() => setMenuOpen(true)}>
+                            <MenuIcon />
+                            </IconButton>
 
-            <Link to="/" className="brand-script text-3xl text-violet-500">
-              vicktykof
-            </Link>
+
+              <Link to="/" className="brand-script ml-10 text-xl text-violet-500">
+                vicktykof
+              </Link>
+            </div>
 
             <div className="flex items-center gap-1">
               <IconButton onClick={() => setSearchOpen(true)}>
                 <SearchOutlinedIcon />
+              </IconButton>
+              <IconButton component={Link} to="/login">
+                <PersonOutlineOutlinedIcon />
               </IconButton>
               <IconButton component={Link} to="/cart">
                 <Badge badgeContent={cartCount} color="secondary">
@@ -146,7 +153,7 @@ export const AppLayout = () => {
           <div className="hidden pb-8 pt-2 md:block">
             <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-10 gap-y-4">
               {navItems.map((item) => (
-                <Link key={item.label} to={item.to} className="nav-link text-[14px] font-medium tracking-[0.015em] text-slate-900">
+                <Link key={item.label} to={item.to} className="nav-link text-[13px] font-medium tracking-[0.015em] text-slate-900">
                   {item.label}
                 </Link>
               ))}
@@ -169,7 +176,7 @@ export const AppLayout = () => {
             <div className="space-y-3">
               <p className="text-sm font-bold uppercase tracking-[0.12em] text-fuchsia-500">Contact Us</p>
               <p className="text-lg font-bold">vicktykof</p>
-              <p className="text-slate-300">6655 Amberton Dr #M, Elkridge MD 21075</p>
+              <p className="text-slate-300">2177 rue du carrousel, Quebec G2B5B5</p>
               <p className="text-slate-300">+1(581)745-7409</p>
               <p className="text-slate-300">vicktykoff@gmail.com</p>
             </div>
@@ -212,13 +219,13 @@ export const AppLayout = () => {
       <Drawer anchor="left" open={menuOpen} onClose={() => setMenuOpen(false)}>
         <Box className="w-[290px] space-y-3 p-4">
           <div className="mb-2 flex items-center justify-between">
-            <p className="brand-script text-3xl text-violet-500">vicktykof</p>
+            <p className="brand-script text-xl text-violet-500">vicktykof</p>
             <IconButton onClick={() => setMenuOpen(false)}>
               <CloseIcon />
             </IconButton>
           </div>
           {navItems.map((item) => (
-            <Link key={item.label} to={item.to} onClick={() => setMenuOpen(false)} className="block border-b border-slate-200 py-3 text-lg font-medium">
+            <Link key={item.label} to={item.to} onClick={() => setMenuOpen(false)} className="block border-b border-slate-200 py-3 text-sm font-medium">
               {item.label}
             </Link>
           ))}

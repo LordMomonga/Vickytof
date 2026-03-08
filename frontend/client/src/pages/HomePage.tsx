@@ -54,21 +54,30 @@ export const HomePage = () => {
             </IconButton>
           </div>
         </div>
+        <div className="flex items-center justify-end text-xs text-slate-500 md:hidden">
+          <span>Glisser pour voir plus</span>
+          <ChevronRightIcon sx={{ fontSize: 18 }} />
+        </div>
 
-        <div ref={serviceSliderRef} className="flex gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {popularServices.map((service, i) => (
-            <motion.div
-              key={service.id}
-              initial={{ opacity: 0, y: 14 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className="min-w-[78%] sm:min-w-[46%] lg:min-w-[31%] xl:min-w-[24%]"
-            >
-              <img src={service.image} alt={service.name} className="h-72 w-full object-cover" />
-              <p className="pt-2 text-center text-sm font-medium">{service.name}</p>
-            </motion.div>
-          ))}
+        <div className="relative">
+          <div ref={serviceSliderRef} className="flex gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {popularServices.map((service, i) => (
+              <motion.div
+                key={service.id}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+                className="min-w-[78%] sm:min-w-[46%] lg:min-w-[31%] xl:min-w-[24%]"
+              >
+                <img src={service.image} alt={service.name} className="h-72 w-full object-cover" />
+                <p className="pt-2 text-center text-sm font-medium">{service.name}</p>
+              </motion.div>
+            ))}
+          </div>
+          <div className="pointer-events-none absolute bottom-2 right-0 flex items-center rounded-l-full bg-white/85 px-2 py-1 text-xs text-slate-600 md:hidden">
+            <ChevronRightIcon sx={{ fontSize: 16 }} />
+          </div>
         </div>
       </section>
 

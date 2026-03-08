@@ -55,90 +55,99 @@ export const ProductGrid = ({ title, products }: ProductGridProps) => {
           </IconButton>
         </div>
       </div>
+      <div className="flex items-center justify-end text-xs text-slate-500 md:hidden">
+        <span>Glisser pour voir plus</span>
+        <ChevronRightIcon sx={{ fontSize: 18 }} />
+      </div>
 
-      <div
-        ref={sliderRef}
-        className="flex gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
-        {products.map((product, i) => (
-          <motion.article
-            key={product.id}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ delay: i * 0.05 }}
-            className="min-w-[78%] overflow-hidden rounded-[16px] border border-slate-300 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg sm:min-w-[46%] lg:min-w-[31%] xl:min-w-[24%]"
-          >
-            <div className="relative">
-              <img src={product.image} alt={product.name} className="h-64 w-full object-cover" loading="lazy" />
-              <div className="absolute bottom-2 right-2 flex items-center gap-2">
-                <button
-                  className="rounded-none border border-white/70 bg-black/85 p-2 text-white transition hover:bg-violet-600"
-                  aria-label={`Add ${product.name} to wishlist`}
-                >
-                  <FavoriteBorderIcon fontSize="small" />
-                </button>
-                <button
-                  onClick={() => addItem(product)}
-                  className="rounded-none border border-white/70 bg-black p-2 text-white transition hover:bg-violet-600"
-                  aria-label={`Add ${product.name} to cart`}
-                >
-                  <Badge
-                    badgeContent={quantityByProductId[product.id] ?? 0}
-                    color="secondary"
-                    sx={{
-                      "& .MuiBadge-badge": {
-                        fontSize: "0.65rem",
-                        height: "17px",
-                        minWidth: "17px",
-                      },
-                    }}
-                  >
-                    <ShoppingBagOutlinedIcon fontSize="small" />
-                  </Badge>
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-1 p-3">
-              <p className="text-sm font-semibold leading-tight text-black">{product.name}</p>
-              <p className="text-sm font-medium text-slate-900">From ${product.price.toFixed(2)}</p>
-              <div className="flex items-center gap-1 text-amber-500">
-                {Array.from({ length: 5 }).map((_, idx) => (
-                  <StarIcon key={`${product.id}-star-${idx}`} sx={{ fontSize: "0.95rem" }} />
-                ))}
-                <span className="pl-1 text-xs text-slate-600">({product.rating.toFixed(1)})</span>
-              </div>
-              <div className="mt-2 flex items-center gap-2">
-                <div className="flex items-center overflow-hidden rounded-none border border-slate-300">
+      <div className="relative">
+        <div
+          ref={sliderRef}
+          className="flex gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {products.map((product, i) => (
+            <motion.article
+              key={product.id}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ delay: i * 0.05 }}
+              className="min-w-[78%] overflow-hidden rounded-[16px] border border-slate-300 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg sm:min-w-[46%] lg:min-w-[31%] xl:min-w-[24%]"
+            >
+              <div className="relative">
+                <img src={product.image} alt={product.name} className="h-64 w-full object-cover" loading="lazy" />
+                <div className="absolute bottom-2 right-2 flex items-center gap-2">
                   <button
-                    onClick={() => decrement(product.id)}
-                    className="px-3 py-[7px] text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
-                    aria-label={`Decrease ${product.name}`}
+                    className="rounded-none border border-white/70 bg-black/85 p-2 text-white transition hover:bg-violet-600"
+                    aria-label={`Add ${product.name} to wishlist`}
                   >
-                    -
+                    <FavoriteBorderIcon fontSize="small" />
                   </button>
-                  <span className="min-w-[28px] border-l border-r border-slate-300 px-2 py-[7px] text-center text-xs font-semibold">
-                    {quantityByProductId[product.id] ?? 0}
-                  </span>
                   <button
-                    onClick={() => (quantityByProductId[product.id] ? increment(product.id) : addItem(product))}
-                    className="px-3 py-[7px] text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
-                    aria-label={`Increase ${product.name}`}
+                    onClick={() => addItem(product)}
+                    className="rounded-none border border-white/70 bg-black p-2 text-white transition hover:bg-violet-600"
+                    aria-label={`Add ${product.name} to cart`}
                   >
-                    +
+                    <Badge
+                      badgeContent={quantityByProductId[product.id] ?? 0}
+                      color="secondary"
+                      sx={{
+                        "& .MuiBadge-badge": {
+                          fontSize: "0.65rem",
+                          height: "17px",
+                          minWidth: "17px",
+                        },
+                      }}
+                    >
+                      <ShoppingBagOutlinedIcon fontSize="small" />
+                    </Badge>
                   </button>
                 </div>
-                <button
-                  className="rounded-none border border-slate-300 bg-[#f8f8f8] px-2 py-[6px] text-slate-800 transition hover:border-violet-400 hover:text-violet-600"
-                  aria-label="Save to favorites"
-                >
-                  <FavoriteBorderIcon sx={{ fontSize: "1rem" }} />
-                </button>
               </div>
-            </div>
-          </motion.article>
-        ))}
+
+              <div className="space-y-1 p-3">
+                <p className="text-sm font-semibold leading-tight text-black">{product.name}</p>
+                <p className="text-sm font-medium text-slate-900">From ${product.price.toFixed(2)}</p>
+                <div className="flex items-center gap-1 text-amber-500">
+                  {Array.from({ length: 5 }).map((_, idx) => (
+                    <StarIcon key={`${product.id}-star-${idx}`} sx={{ fontSize: "0.95rem" }} />
+                  ))}
+                  <span className="pl-1 text-xs text-slate-600">({product.rating.toFixed(1)})</span>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="flex items-center overflow-hidden rounded-none border border-slate-300">
+                    <button
+                      onClick={() => decrement(product.id)}
+                      className="px-3 py-[7px] text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+                      aria-label={`Decrease ${product.name}`}
+                    >
+                      -
+                    </button>
+                    <span className="min-w-[28px] border-l border-r border-slate-300 px-2 py-[7px] text-center text-xs font-semibold">
+                      {quantityByProductId[product.id] ?? 0}
+                    </span>
+                    <button
+                      onClick={() => (quantityByProductId[product.id] ? increment(product.id) : addItem(product))}
+                      className="px-3 py-[7px] text-sm font-semibold text-slate-800 transition hover:bg-slate-100"
+                      aria-label={`Increase ${product.name}`}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <button
+                    className="rounded-none border border-slate-300 bg-[#f8f8f8] px-2 py-[6px] text-slate-800 transition hover:border-violet-400 hover:text-violet-600"
+                    aria-label="Save to favorites"
+                  >
+                    <FavoriteBorderIcon sx={{ fontSize: "1rem" }} />
+                  </button>
+                </div>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+        <div className="pointer-events-none absolute bottom-1 right-0 flex items-center rounded-l-full bg-white/85 px-2 py-1 text-xs text-slate-600 md:hidden">
+          <ChevronRightIcon sx={{ fontSize: 16 }} />
+        </div>
       </div>
     </section>
   );
