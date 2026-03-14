@@ -3,6 +3,7 @@ import { AppLayout } from "./layouts/AppLayout";
 import { BookingPage } from "./pages/BookingPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
 import { AppointmentsPage } from "./pages/AppointmentsPage";
 import { DashboardPage } from "./pages/admin/DashboardPage";
 import { ServicesPage } from "./pages/admin/ServicesPage";
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
 
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/products" element={<ProductsPage />} />

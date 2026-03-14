@@ -1,6 +1,6 @@
 import { Alert, Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useLogin } from "../hooks/useAuth";
 
 export const LoginPage = () => {
@@ -108,6 +108,13 @@ export const LoginPage = () => {
         >
           Continue
         </Button>
+
+        <div className="mt-5 text-center text-sm text-slate-600">
+          <span>Je n&apos;ai pas de compte ? </span>
+          <Link to="/register" className="font-semibold text-[#0b63ce] hover:underline">
+            Inscription
+          </Link>
+        </div>
 
         <div className="mt-6 flex justify-center gap-4 text-sm text-[#0b63ce]">
           <a href="#">Privacy policy</a>
